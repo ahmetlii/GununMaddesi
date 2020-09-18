@@ -32,7 +32,7 @@ def login(wiki, username):
     with urllib.request.urlopen(req) as response:
         page_confirm = response.read()
             if (page_confirm = 'UI')
-                urllib.request.Request('https://' + wiki + '.org/w/api.php?action=clientlogin&logincontinue=1&OATHToken=',"""bu kısma OATHToken gelmeli""", '&logintoken=', """buraya da normal token gelmeli""", cookies=r1.cookies)
+                urllib.request.Request('https://' + wiki + '.org/w/api.php?action=clientlogin&logincontinue=1&OATHToken=',"""bu kısma OATHToken gelmeli""", '&logintoken=', login_token, cookies=r1.cookies)
 
 def content_of_page(wiki, title):
     page= requests.get('https://' + wiki + '.org/w/index.php?title=' + title + '&action=raw')
