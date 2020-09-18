@@ -11,7 +11,7 @@ import re
 import sys
 
 import requests
-import urllib.request
+import urllib2
 
 reload(sys)
 sys.setdefaultencoding('UTF8')
@@ -25,21 +25,18 @@ def login(wiki, username):
     payload = {'action': 'query', 'format': 'json', 'utf8': '', 'meta': 'tokens', 'type': 'login'}
     r1 = requests.post('https://' + wiki + '.org/w/api.php', data=payload)
     login_token = r1.json()['query']['tokens']['logintoken']
-    payload = {'action': 'query', 'format': 'json', 'meta': 'authmanagerinfo', 'requests': ['username': username, 'password': passw], 'amirequestfor': 'login', 'utf8': '',
-                'logintoken': login_token}
+    payload = {'action': 'query', 'format': 'json', 'meta': 'authmanagerinfo', 'requests': {'username': username, 'password': passw}, 'amirequestfor': 'login', 'utf8': '', 'logintoken': login_token}
     r2 = requests.post('https://' + wiki + '.org/w/api.php', data=payload)
-    payload = {'action': 'clientlogin', 'format': 'json', 'utf8': '', 'username': username, 'password': passw,
-               'logintoken': login_token}
-    r3 = urllib.request.Request('https://' + wiki + '.org/w/api.php', data=payload, cookies=r1.cookies)
-    with urllib.request.urlopen(r3) as response:
+    payload = {'action': 'clientlogin', 'format': 'json', 'utf8': '', 'username': username, 'password': passw, 'logintoken': login_token}
+    r3 = urllib2.Request('https://' + wiki + '.org/w/api.php', data=payload)
+    with urllib2.urlopen(r3) as response:
         page_confirm = response.read()
-            if (page_confirm = 'UI')
-                payload =  {'action': 'centralauthtoken', 'format': 'json', 'utf8': '',}
-                urllib.request.Request('https://' + wiki + '.org/w/api.php', data=payload)
-                OATHauth = r4.json()['centralauthtoken']['centralauthtoken']
-                 {'action': 'clientlogin', 'logincontinue': '1', 'format': 'json', 'utf8': '', 'username': username, 'password': passw, 'OATHToken': OATHauth,
-                  'logintoken': login_token}
-                urllib.request.Request('https://' + wiki + '.org/w/api.php', data=payload, cookies=r1.cookies)
+        if (page_confirm == 'UI'):
+            payload =  {'action': 'centralauthtoken', 'format': 'json', 'utf8': '',}
+            r4 = urllib2.Request('https://' + wiki + '.org/w/api.php', data=payload)
+            OATHauth = r4.json()['centralauthtoken']['centralauthtoken']
+            payload = {'action': 'clientlogin', 'logincontinue': '1', 'format': 'json', 'utf8': '', 'username': username, 'password': passw, 'OATHToken': OATHauth, 'logintoken': login_token}
+            urllib2.Request('https://' + wiki + '.org/w/api.php', data=payload, cookies=r1.cookies)
 
 def content_of_page(wiki, title):
     page= requests.get('https://' + wiki + '.org/w/index.php?title=' + title + '&action=raw')
