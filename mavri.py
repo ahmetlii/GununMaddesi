@@ -24,15 +24,22 @@ def login(wiki, username):
 
     payload = {'action': 'query', 'format': 'json', 'utf8': '', 'meta': 'tokens', 'type': 'login'}
     r1 = requests.post('https://' + wiki + '.org/w/api.php', data=payload)
-
     login_token = r1.json()['query']['tokens']['logintoken']
+    payload = {'action': 'query', 'format': 'json', 'meta': 'authmanagerinfo', 'requests': ['username': username, 'password': passw], 'amirequestfor': 'login', 'utf8': '',
+                'logintoken': login_token}
+    r2 = requests.post('https://' + wiki + '.org/w/api.php', data=payload)
     payload = {'action': 'clientlogin', 'format': 'json', 'utf8': '', 'username': username, 'password': passw,
                'logintoken': login_token}
-    req = urllib.request.Request('https://' + wiki + '.org/w/api.php', data=payload, cookies=r1.cookies)
-    with urllib.request.urlopen(req) as response:
+    r3 = urllib.request.Request('https://' + wiki + '.org/w/api.php', data=payload, cookies=r1.cookies)
+    with urllib.request.urlopen(r3) as response:
         page_confirm = response.read()
             if (page_confirm = 'UI')
-                urllib.request.Request('https://' + wiki + '.org/w/api.php?action=clientlogin&logincontinue=1&OATHToken=',"""bu kısma OATHToken gelmeli""", '&logintoken=', login_token, cookies=r1.cookies)
+                payload =  {'action': 'centralauthtoken', 'format': 'json', 'utf8': '',}
+                urllib.request.Request('https://' + wiki + '.org/w/api.php', data=payload)
+                OATHauth = r4.json()['centralauthtoken']['centralauthtoken']
+                 {'action': 'clientlogin', 'logincontinue': '1', 'format': 'json', 'utf8': '', 'username': username, 'password': passw, 'OATHToken': OATHauth,
+                  'logintoken': login_token}
+                urllib.request.Request('https://' + wiki + '.org/w/api.php', data=payload, cookies=r1.cookies)
 
 def content_of_page(wiki, title):
     page= requests.get('https://' + wiki + '.org/w/index.php?title=' + title + '&action=raw')
