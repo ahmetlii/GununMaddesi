@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/python
 
-# mavri kütüphanesinin sadece gerekli olan fonksiyonları. 
+# mavri kütüphanesinin sadece gerekli olan fonksiyonları.
 # Bu proje için kullanılmayanlar temizlendi.
 # --Mavrikant
 
@@ -11,6 +11,7 @@ import re
 import sys
 
 import requests
+import urllib.request
 
 reload(sys)
 sys.setdefaultencoding('UTF8')
@@ -25,9 +26,13 @@ def login(wiki, username):
     r1 = requests.post('https://' + wiki + '.org/w/api.php', data=payload)
 
     login_token = r1.json()['query']['tokens']['logintoken']
-    payload = {'action': 'login', 'format': 'json', 'utf8': '', 'lgname': username, 'lgpassword': passw,
-               'lgtoken': login_token}
-    return requests.post('https://' + wiki + '.org/w/api.php', data=payload, cookies=r1.cookies)
+    payload = {'action': 'clientlogin', 'format': 'json', 'utf8': '', 'username': username, 'password': passw,
+               'logintoken': login_token}
+    req = urllib.request.Request('https://' + wiki + '.org/w/api.php', data=payload, cookies=r1.cookies)
+    with urllib.request.urlopen(req) as response:
+        page_confirm = response.read()
+            if (page_confirm = 'UI')
+                urllib.request.Request('https://' + wiki + '.org/w/api.php?action=clientlogin&logincontinue=1&OATHToken=',"""bu kısma OATHToken gelmeli""", '&logintoken=', """buraya da normal token gelmeli""", cookies=r1.cookies)
 
 def content_of_page(wiki, title):
     page= requests.get('https://' + wiki + '.org/w/index.php?title=' + title + '&action=raw')
